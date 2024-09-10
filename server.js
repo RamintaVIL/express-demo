@@ -62,7 +62,7 @@ app.get('/movie', (request, response) => {
 });
 
 app.get('/movie/:id', (request, response) => {
-    const movie = movies.find(m => m.id === parseInt(request.params.id));
+    const movie = movies.find(m => m.id == parseInt(request.params.id));
     if (!movie) return response.status(404).send('Movie not found');
     response.json(movie);
 });
@@ -80,7 +80,7 @@ app.post('/movie', (request, response) => {
         creationDate,
         actorId,
     }
-    actors.push(movie);
+    movies.push(movie);
     response.status(201).json(movie);
 });
 
