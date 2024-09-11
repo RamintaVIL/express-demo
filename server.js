@@ -85,15 +85,16 @@ app.post('/movie', (request, response) => {
 });
 
 app.put('/movie/:id', (request, response) => {
-    const movie = movies.find(m => m.id === request.params.id, 10);
+    const movie = movies.find(m => m.id === parseInt(request.params.id));
     if (!movie) return response.status(404).send('Movie not found');
+
+    const { title, creationDate, actorId } = request.body;
 
     if (actorId) {
         const actor = actors.find(a => a.id === parseInt(actorId));
-        if (!actor) return res.status(404).send('Actor not found');
+        if (!actor) return response.status(404).send('Actor not found');
     }
 
-    const { title, creationDate, actorId } = req.body;
     movie.title = title || movie.title;
     movie.creationDate = creationDate || movie.creationDate;
     movie.actorId = actorId || movie.actorId;
@@ -101,7 +102,7 @@ app.put('/movie/:id', (request, response) => {
 });
 
 app.delete('/movie/:id', (request, response) => {
-    const movieIndex = movies.findIndex(m => m.id === request.params.id);
+    const movieIndex = movies.findIndex(m => m.id === parseInt(request.params.id));
     if (movieIndex === -1) return response.status(404).send('Movie not found');
 
     movies.splice(movieIndex, 1);
@@ -112,13 +113,3 @@ app.delete('/movie/:id', (request, response) => {
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
-// Create REST api with Express and Js For Movie and Actor management.
-// The api should store data in memory.
-
-// for simplicity lets say actor can be involved in just a single movie.
-
-// 1. Actor can have FirstName, LastName and DateOfBirth
-// 2. Date of birth cannot be in future.
-// 3. Movie can have title, creationDate and a single actor associated.Actor Id has to be supplied.
-// 4. When creating movie, if actor id is not supplied, 400 has to be returned.If Actor does not exist, 404 must be returned.
-// 5. Create CRUD for Movies and Actors.
