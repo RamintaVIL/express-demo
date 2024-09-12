@@ -12,5 +12,5 @@ CREATE TABLE movie (
     title VARCHAR(255) NOT NULL,
     creation_date DATE NOT NULL,
     actor_id INT,
-    FOREIGN KEY (actor_id) REFERENCES actor(id)
+    FOREIGN KEY (actor_id) REFERENCES actor(id) ON DELETE CASCADE;
 );
