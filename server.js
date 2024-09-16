@@ -59,6 +59,7 @@ app.post('/actor', async (request, response) => {
     try {
         // Vykdoma SQL INSERT užklausa, kuri įterpia naują aktorių į lentelę ir grąžina pridėtą įrašą.
         const result = await pool.query(
+            // SQL kodas, koki rasydavome i postgre. Values $ perduoda kintamuosius, jie pareina is body
             'INSERT INTO actor (name, surname, date_of_birth) VALUES ($1, $2, $3) RETURNING *',
             [name, surname, dateOfBirth]
         );
