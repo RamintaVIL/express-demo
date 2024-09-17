@@ -1,0 +1,1272 @@
+{
+	"info": {
+		"_postman_id": "04c196ef-5465-44d5-84f7-8564e8e294b8",
+		"name": "Express-demo-collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "38003990"
+	},
+	"item": [
+		{
+			"name": "Create actor functionality",
+			"item": [
+				{
+					"name": "Actor created successfully",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"//tai Postman funkcija, kuri grąžina JSON formato atsakymą iš API",
+									"const responseJson = pm.response.json()",
+									"const requestBody = pm.request.body.raw;",
+									"const requestJson = JSON.parse(requestBody);",
+									"",
+									"pm.collectionVariables.set('actorId', responseJson.id)",
+									"pm.collectionVariables.set('actorName',requestJson.name)",
+									"pm.collectionVariables.set('actorSurname',requestJson.surname)",
+									"",
+									"pm.test(\"Check that returned data is correct\", () => {",
+									"    pm.expect(responseJson.id).to.be.a('number').and.be.above(0);",
+									"    pm.expect(responseJson.name).to.eql(requestJson.name);",
+									"    pm.expect(responseJson.surname).to.eql(requestJson.surname);",
+									"})",
+									"",
+									"pm.test(\"Date of birth is correctly parsed\", () => {",
+									"    const dateOfBirth = new Date(responseJson.date_of_birth);",
+									"    pm.expect(dateOfBirth.getFullYear()).to.eql(1980);",
+									"});",
+									"",
+									"pm.test(\"Response status code is 201\", () => {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 2 seconds\", () => {",
+									"  pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n        \"name\": \"John\",\n        \"surname\": \"Doe\",\n        \"dateOfBirth\": \"1980-01-15\"\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/actor",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"actor"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve the list of created actors",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Returns 200\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200)",
+									"})",
+									"",
+									"pm.test('\"Response time is less than 2 seconds', () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000)",
+									"}) ",
+									"",
+									"pm.test(\"Check if name and surname information are correct\", () => {",
+									"    // Get variables from collection or environment",
+									"    const name = pm.collectionVariables.get(\"actorName\"); // actor first name",
+									"    const surname = pm.collectionVariables.get(\"actorSurname\");   // actor last name",
+									"    const actorId = pm.collectionVariables.get(\"actorId\");          // actor ID",
+									"",
+									"    // Get response data (array)",
+									"    const jsonData = pm.response.json();",
+									"",
+									"    // Check if at least one object in the array has the desired values",
+									"    const found = jsonData.some(function (item) {",
+									"        return item.id == actorId && item.name === name && item.surname === surname;",
+									"    });",
+									"",
+									"    // Expect such record to exist",
+									"    pm.expect(found).to.be.true",
+									"})",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/actor",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"actor"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve the created actor by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", () => {",
+									"  pm.response.to.have.status(200);",
+									"});",
+									"",
+									"actor_id = pm.collectionVariables.get('actorId')",
+									"console.log(actor_id)",
+									"",
+									"pm.test('check if returned actor has correct id', () => {",
+									"    const data = pm.response.json()",
+									"    pm.expect(data.id).to.be.eql(actor_id)",
+									"})",
+									"",
+									"pm.test(\"Name and surname match input\", () => {",
+									"    const responseJSON = pm.response.json();",
+									"    const firstName = pm.collectionVariables.get(\"actorName\");",
+									"    const surname = pm.collectionVariables.get(\"actorSurname\");",
+									"",
+									"    console.log('Response name:', responseJSON.name);",
+									"    console.log('Expected name:', firstName);",
+									"    console.log('Response surname:', responseJSON.surname);",
+									"    console.log('Expected surname:', surname);",
+									"",
+									"    // Patikrinkite, ar `name` ir `surname` atitinka kintamųjų reikšmes",
+									"    pm.expect(responseJSON.name).to.eql(firstName);",
+									"    pm.expect(responseJSON.surname).to.eql(surname);",
+									"});",
+									"",
+									"pm.test('Date of birth is present and not empty', () => {",
+									"    const responseData = pm.response.json();",
+									"    pm.expect(responseData).to.have.property('date_of_birth').that.is.not.empty;",
+									"});",
+									"",
+									"pm.test('\"Response time is less than 2 seconds', () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000)",
+									"}) ",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/actor/{{actorId}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"actor",
+								"{{actorId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create an actor with an incorrect birth date",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", () => {",
+									"    pm.response.to.have.status(400)",
+									"})",
+									"pm.test(\"Returns correct text\", () => {",
+									"    pm.expect(pm.response.text()).to.eql('Date of birth cannot be in the future')",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "  {\n        \"name\": \"Jane\",\n        \"surname\": \"Smith\",\n        \"dateOfBirth\": \"2025-03-22\"\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/actor",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"actor"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Update actor functionality",
+			"item": [
+				{
+					"name": "Create a new actor",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseJson = pm.response.json()",
+									"const requestBody = pm.request.body.raw;",
+									"const requestJson = JSON.parse(requestBody);",
+									"",
+									"pm.collectionVariables.set('actorId', responseJson.id)",
+									"pm.collectionVariables.set('actorName',requestJson.name)",
+									"pm.collectionVariables.set('actorSurname',requestJson.surname)",
+									"",
+									"pm.test(\"Check that returned data is correct\", () => {",
+									"    pm.expect(responseJson.id).to.be.a('number').and.be.above(0);",
+									"    pm.expect(responseJson.name).to.eql(requestJson.name);",
+									"    pm.expect(responseJson.surname).to.eql(requestJson.surname);",
+									"})",
+									"",
+									"pm.test(\"Response status code is 201\", () => {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 2 seconds\", () => {",
+									"  pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": " {\n        \"name\": \"Chris\",\n        \"surname\": \"Wilson\",\n        \"dateOfBirth\": \"1982-11-05\"\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/actor",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"actor"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Successfully update actor information by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": " {\n        \"name\": \"Mari\",\n        \"surname\": \"Wilson\",\n        \"dateOfBirth\": \"1992-11-05\"\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/actor/{{actorId}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"actor",
+								"{{actorId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve the created actor by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", () => {",
+									"  pm.response.to.have.status(200);",
+									"});",
+									"",
+									"actor_id = pm.collectionVariables.get('actorId')",
+									"console.log(actor_id)",
+									"",
+									"pm.test('check if returned actor has correct id', () => {",
+									"    const data = pm.response.json()",
+									"    pm.expect(data.id).to.be.eql(actor_id)",
+									"})",
+									"",
+									"pm.test(\"Name and surname match input\", () => {",
+									"    const responseJSON = pm.response.json();",
+									"    const firstName = pm.collectionVariables.get(\"actorName\");",
+									"    const surname = pm.collectionVariables.get(\"actorSurname\");",
+									"",
+									"    console.log('Response name:', responseJSON.name);",
+									"    console.log('Expected name:', firstName);",
+									"    console.log('Response surname:', responseJSON.surname);",
+									"    console.log('Expected surname:', surname);",
+									"",
+									"    // Patikrinkite, ar `name` ir `surname` atitinka kintamųjų reikšmes",
+									"    pm.expect(responseJSON.name).to.eql(firstName);",
+									"    pm.expect(responseJSON.surname).to.eql(surname);",
+									"});",
+									"",
+									"pm.test('Date of birth is present and not empty', () => {",
+									"    const responseData = pm.response.json();",
+									"    pm.expect(responseData).to.have.property('date_of_birth').that.is.not.empty;",
+									"});",
+									"",
+									"pm.test('\"Response time is less than 2 seconds', () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000)",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/actor/3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"actor",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve the list of created actors",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Returns 200\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200)",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/actor",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"actor"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upadate actor id which not existed",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Returns 404\", () => {",
+									"    pm.expect(pm.response.code).to.eql(404)",
+									"})",
+									"pm.test(\"Returns correct text\", () => {",
+									"    pm.expect(pm.response.text()).to.eql('Actor not found')",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": " {\n        \"name\": \"Mari\",\n        \"surname\": \"Wilson\",\n        \"dateOfBirth\": \"1992-11-05\"\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/actor/9999999",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"actor",
+								"9999999"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Delete actor functionality",
+			"item": [
+				{
+					"name": "Create an actor entry for deletion",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseJson = pm.response.json()",
+									"const requestBody = pm.request.body.raw;",
+									"const requestJson = JSON.parse(requestBody);",
+									"",
+									"pm.collectionVariables.set('actorId', responseJson.id)",
+									"pm.collectionVariables.set('actorName',requestJson.name)",
+									"pm.collectionVariables.set('actorSurname',requestJson.surname)",
+									"",
+									"pm.test(\"Check that returned data is correct\", () => {",
+									"    pm.expect(responseJson.id).to.be.a('number').and.be.above(0);",
+									"    pm.expect(responseJson.name).to.eql(requestJson.name);",
+									"    pm.expect(responseJson.surname).to.eql(requestJson.surname);",
+									"})",
+									"",
+									"pm.test(\"Date of birth is correctly parsed\", () => {",
+									"    const dateOfBirth = new Date(jsonData.date_of_birth);",
+									"    pm.expect(dateOfBirth.getFullYear()).to.eql(1980);",
+									"});",
+									"",
+									"pm.test(\"Response status code is 201\", () => {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 2 seconds\", () => {",
+									"  pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": " {\n        \"name\": \"Chris\",\n        \"surname\": \"Wilson\",\n        \"dateOfBirth\": \"1982-11-05\"\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/actor",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"actor"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete an actor by an existing ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Returns 204\", () => {",
+									"    pm.response.to.have.status(204);",
+									"});",
+									"",
+									"pm.test(\"Response body is empty\", () => {",
+									"    pm.expect(pm.response.text()).to.be.empty;",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/actor/60",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"actor",
+								"60"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve the created actor by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", () => {",
+									"  pm.response.to.have.status(200);",
+									"});",
+									"",
+									"actor_id = pm.collectionVariables.get('actorId')",
+									"console.log(actor_id)",
+									"",
+									"pm.test('check if returned actor has correct id', () => {",
+									"    const data = pm.response.json()",
+									"    pm.expect(data.id).to.be.eql(actor_id)",
+									"})",
+									"",
+									"pm.test('\"Response time is less than 2 seconds', () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000)",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/actor/{{actorId}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"actor",
+								"{{actorId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve the list of created actors",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Returns 200\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200)",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/actor",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"actor"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deleting an actor with an ID that does not exist",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Returns 404\", () => {",
+									"    pm.expect(pm.response.code).to.eql(404)",
+									"})",
+									"pm.test(\"Returns correct text\", () => {",
+									"    pm.expect(pm.response.text()).to.eql('Actor not found')",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/actor/100000000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"actor",
+								"100000000"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Create movie functionality",
+			"item": [
+				{
+					"name": "Movie created successfully.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Movie title is correct\", () => {",
+									"    const responseJson = pm.response.json()",
+									"    pm.expect(responseJson.title).to.eql(\"Mystery of the Lost City\")",
+									"})",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": " {\n        \"title\": \"Mystery of the Lost City\",\n        \"creationDate\": \"2022-03-22\",\n        \"actorId\": 2\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/movie",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"movie"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve the created movie by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/movie/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"movie",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve the list of created movies",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Returns 200\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200)",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/movie",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"movie"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create a movie with an incorrect release date",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Returns 400\", () => {",
+									"    pm.expect(pm.response.code).to.eql(400)",
+									"})",
+									"pm.test(\"Returns correct text\", () => {",
+									"    pm.expect(pm.response.text()).to.eql('Date of the movie cannot be in the future')",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": " {\n        \"title\": \"Mystery of the Lost City\",\n        \"creationDate\": \"2080-03-22\",\n        \"actorId\": 2\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/movie",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"movie"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Update movie functionality",
+			"item": [
+				{
+					"name": "Create a new movie",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Movie title and actorId are correct\", () => {",
+									"    const responseJson = pm.response.json()",
+									"    console.log(pm.response.json())",
+									"    pm.expect(responseJson.title).to.eql(\"The Great Adventure\");",
+									"    pm.expect(responseJson.actor_id).to.eql(3)",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": " {\n        \"title\": \"The Great Adventure\",\n        \"creationDate\": \"2023-01-15\",\n        \"actorId\": 3\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/movie",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"movie"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Successfully update movie information by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"update movie information is correct\", () => {",
+									"    const responseJson = pm.response.json()",
+									"    pm.expect(responseJson.title).to.eql(\"The Great Adventure\");",
+									"    pm.expect(responseJson.actor_id).to.eql(4)",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": " {\n        \"title\": \"The Great Adventure\",\n        \"creationDate\": \"2009-01-15\",\n        \"actorId\": 4\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/movie/3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"movie",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve a deleted movie by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/movie/3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"movie",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a list of all movies",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Returns 200\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200)",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/movie",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"movie"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update a movie with an ID that does not exist",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Returns 404\", () => {",
+									"    pm.expect(pm.response.code).to.eql(404)",
+									"})",
+									"pm.test(\"Return correct text\", () => {",
+									"    pm.expect(pm.response.text()).to.eql('Movie not found')",
+									"})",
+									"",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": " {\n        \"name\": \"Mari\",\n        \"surname\": \"Wilson\",\n        \"dateOfBirth\": \"1992-11-05\"\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/movie/9999999",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"movie",
+								"9999999"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Delete movie functionality",
+			"item": [
+				{
+					"name": "Create a movie record to be deleted",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check that returned data is correct\", () => {",
+									"    const responseJson = pm.response.json()",
+									"console.log(pm.response.json());",
+									"    pm.expect(responseJson.title).to.eql(\"Mystery of the Lost City\");",
+									"    pm.expect(responseJson.actor_id).to.eql(2);",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": " {\n        \"title\": \"Mystery of the Lost City\",\n        \"creationDate\": \"2022-03-22\",\n        \"actorId\": 2\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/movie",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"movie"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a movie by an existing ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Returns 404\", () => {",
+									"    pm.expect(pm.response.code).to.eql(404)",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/movie/{{actorId}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"movie",
+								"{{actorId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve a deleted movie by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/movie/4",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"movie",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a list of all movies",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Returns 200\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200)",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/movie",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"movie"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deleting a movie ID that does not exist",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Returns 404\", () => {",
+									"    pm.expect(pm.response.code).to.eql(404)",
+									"})",
+									"pm.test(\"Returns correct text\", () => {",
+									"    pm.expect(pm.response.text()).to.eql('Movie not found')",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/movie/100000000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"movie",
+								"100000000"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "actorId",
+			"value": ""
+		},
+		{
+			"key": "actorName",
+			"value": ""
+		},
+		{
+			"key": "actorSurname",
+			"value": ""
+		}
+	]
+}
