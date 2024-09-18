@@ -185,7 +185,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:3000/actor/{{actorId}}",
+							"raw": "http://localhost:3000/actor/2",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -193,7 +193,7 @@
 							"port": "3000",
 							"path": [
 								"actor",
-								"{{actorId}}"
+								"2"
 							]
 						}
 					},
@@ -338,7 +338,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:3000/actor/{{actorId}}",
+							"raw": "http://localhost:3000/actor/2",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -346,7 +346,7 @@
 							"port": "3000",
 							"path": [
 								"actor",
-								"{{actorId}}"
+								"2"
 							]
 						}
 					},
@@ -373,17 +373,11 @@
 									"",
 									"pm.test(\"Name and surname match input\", () => {",
 									"    const responseJSON = pm.response.json();",
-									"    const firstName = pm.collectionVariables.get(\"actorName\");",
+									"    const name = pm.collectionVariables.get(\"actorName\");",
 									"    const surname = pm.collectionVariables.get(\"actorSurname\");",
 									"",
-									"    console.log('Response name:', responseJSON.name);",
-									"    console.log('Expected name:', firstName);",
-									"    console.log('Response surname:', responseJSON.surname);",
-									"    console.log('Expected surname:', surname);",
-									"",
-									"    // Patikrinkite, ar `name` ir `surname` atitinka kintamųjų reikšmes",
-									"    pm.expect(responseJSON.name).to.eql(firstName);",
-									"    pm.expect(responseJSON.surname).to.eql(surname);",
+									"    pm.expect(responseJSON.name).to.eql(name); // Fixed the variable name from actorName to name",
+									"    pm.expect(responseJSON.surname).to.eql(surname); // Fixed the variable name from actorSurname to surname",
 									"});",
 									"",
 									"pm.test('Date of birth is present and not empty', () => {",
@@ -393,7 +387,8 @@
 									"",
 									"pm.test('\"Response time is less than 2 seconds', () => {",
 									"    pm.expect(pm.response.responseTime).to.be.below(2000)",
-									"})"
+									"})",
+									""
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -404,7 +399,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:3000/actor/3",
+							"raw": "http://localhost:3000/actor/2",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -412,7 +407,7 @@
 							"port": "3000",
 							"path": [
 								"actor",
-								"3"
+								"2"
 							]
 						}
 					},
@@ -603,7 +598,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:3000/actor/60",
+							"raw": "http://localhost:3000/actor/2",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -611,7 +606,7 @@
 							"port": "3000",
 							"path": [
 								"actor",
-								"60"
+								"2"
 							]
 						}
 					},
@@ -649,7 +644,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:3000/actor/{{actorId}}",
+							"raw": "http://localhost:3000/actor/2",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -657,7 +652,7 @@
 							"port": "3000",
 							"path": [
 								"actor",
-								"{{actorId}}"
+								"2"
 							]
 						}
 					},
@@ -788,7 +783,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:3000/movie/1",
+							"raw": "http://localhost:3000/movie/{{movieId}}",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -796,7 +791,7 @@
 							"port": "3000",
 							"path": [
 								"movie",
-								"1"
+								"{{movieId}}"
 							]
 						}
 					},
@@ -1148,7 +1143,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:3000/movie/{{actorId}}",
+							"raw": "http://localhost:3000/movie/{{movieId}}",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -1156,7 +1151,7 @@
 							"port": "3000",
 							"path": [
 								"movie",
-								"{{actorId}}"
+								"{{movieId}}"
 							]
 						}
 					},
@@ -1255,6 +1250,28 @@
 			]
 		}
 	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
 	"variable": [
 		{
 			"key": "actorId",
@@ -1267,6 +1284,11 @@
 		{
 			"key": "actorSurname",
 			"value": ""
+		},
+		{
+			"key": "movieId",
+			"value": "1",
+			"type": "string"
 		}
 	]
 }
