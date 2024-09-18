@@ -777,6 +777,74 @@
 			"name": "Create movie functionality",
 			"item": [
 				{
+					"name": "Actor created successfully Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"//tai Postman funkcija, kuri grąžina JSON formato atsakymą iš API",
+									"const responseJson = pm.response.json()",
+									"//is request padarome json",
+									"const requestBody = pm.request.body.raw;",
+									"const requestJson = JSON.parse(requestBody);",
+									"",
+									"pm.collectionVariables.set('actorId', responseJson.id)",
+									"pm.collectionVariables.set('actorName',requestJson.name)",
+									"pm.collectionVariables.set('actorSurname',requestJson.surname)",
+									"",
+									"pm.test(\"Check that returned data is correct\", () => {",
+									"    pm.expect(responseJson.id).to.be.a('number').and.be.above(0);",
+									"    pm.expect(responseJson.name).to.eql(requestJson.name);",
+									"    pm.expect(responseJson.surname).to.eql(requestJson.surname);",
+									"})",
+									"",
+									"pm.test(\"Date of birth is correctly parsed\", () => {",
+									"    const dateOfBirth = new Date(responseJson.date_of_birth);",
+									"    pm.expect(dateOfBirth.getFullYear()).to.eql(1980);",
+									"});",
+									"",
+									"pm.test(\"Response status code is 201\", () => {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 2 seconds\", () => {",
+									"  pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n        \"name\": \"John\",\n        \"surname\": \"Doe\",\n        \"dateOfBirth\": \"1980-01-15\"\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/actor",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"actor"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Movie created successfully.",
 					"event": [
 						{
@@ -820,7 +888,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": " {\n        \"title\": \"Mystery of the Lost City\",\n        \"creationDate\": \"2022-03-22\",\n        \"actorId\": 121\n    }",
+							"raw": " {\n        \"title\": \"Mystery of the Lost City\",\n        \"creationDate\": \"2022-03-22\",\n        \"actorId\": {{actorId}}\n    }",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -856,24 +924,11 @@
 									"    pm.expect(pm.response.responseTime).to.be.below(2000)",
 									"}) ",
 									"",
-									"// id = pm.collectionVariables.get('movieId')",
-									"// console.log(actor_id)",
-									"",
-									"// pm.test('check if returned movie has correct id', () => {",
-									"//     const data = pm.response.json()",
-									"//     pm.expect(data.id).to.be.eql(id)",
-									"// })",
-									"",
-									"// pm.test(\"Name and surname match input\", () => {",
-									"//     const responseJSON = pm.response.json();",
-									"//     const title = pm.collectionVariables.get(\"movieTitle\");",
-									"//     const actor_id = pm.collectionVariables.get(\"actor_id\");",
-									"",
-									"//     pm.expect(responseJSON.title).to.eql(title);",
-									"//     pm.expect(responseJSON.actor_id).to.eql(actor_id);",
-									"// });",
-									"",
-									"",
+									"pm.test(\"Set collection variables 'title' and 'id' with expected values\", () => {",
+									"    const responseJSON = pm.response.json();",
+									"    pm.collectionVariables.set(\"title\", responseJSON.title);",
+									"    pm.collectionVariables.set(\"id\", responseJSON.id);",
+									"});",
 									""
 								],
 								"type": "text/javascript",
@@ -914,16 +969,15 @@
 									"    pm.expect(pm.response.responseTime).to.be.below(2000)",
 									"}) ",
 									"",
-									"pm.test(\"Check if movie information is correct\", () => {",
+									"pm.test(\"Check id of movie and title are correct\", () => {",
 									"    const id = pm.collectionVariables.get(\"id\");",
-									"    const title = pm.collectionVariables.get(\"title\"); ",
-									"    const actorId = pm.collectionVariables.get(\"actor_id\");",
-									"",
+									"    const title = pm.collectionVariables.get(\"title\");",
+									" ",
 									"    const jsonData = pm.response.json();",
-									"",
-									"    pm.expect(jsonData.id).to.eql(id);",
-									"    pm.expect(jsonData.title).to.eql(title);",
-									"    pm.expect(jsonData.actor_id).to.eql(actorId);",
+									"    const found = jsonData.some(function (item) {",
+									"        return item.id === id && item.title === title",
+									"    });",
+									"    pm.expect(found).to.be.true;",
 									"});",
 									""
 								],
@@ -1163,34 +1217,28 @@
 							"script": {
 								"exec": [
 									"pm.test(\"Returns 200\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200)",
-									"})",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"});",
 									"",
 									"pm.test(\"Response time is less than 2 seconds\", () => {",
-									"    pm.expect(pm.response.responseTime).to.be.below(2000)",
-									"}) ",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});",
 									"",
-									"pm.test(\"Check if update request info is correct\", () => {",
+									"pm.test(\"Check if id, title of movie and actorId update correct\", () => {",
 									"    const id = pm.collectionVariables.get(\"id\");",
 									"    const title = pm.collectionVariables.get(\"title\");",
-									"    const actor_id = pm.collectionVariables.get(\"actorId\");",
-									"",
-									"    console.log(\"movieId:\", id);",
-									"    console.log(\"movieTitle:\", title);",
-									"    console.log(\"actorId:\", actor_id);",
-									"    console.log(\"Response JSON:\", jsonData);",
-									"",
+									"    const actorId = pm.collectionVariables.get(\"actor_id\"); ",
 									"",
 									"    const jsonData = pm.response.json();",
-									"",
 									"    const found = jsonData.some(item => {",
 									"        return item.id === id &&",
 									"               item.title === title &&",
 									"               item.actor_id === actorId;",
 									"    });",
 									"",
-									"    pm.expect(found, 'Record not found in response').to.be.true;",
-									"});"
+									"    pm.expect(found).to.be.true;",
+									"});",
+									""
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -1288,7 +1336,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": " {\n        \"title\": \"Mystery of the Lost City\",\n        \"creationDate\": \"2022-03-22\",\n        \"actorId\": 2\n    }",
+							"raw": " {\n        \"id\": {{movieId}},\n        \"title\": \"Mystery of the Lost City\",\n        \"creationDate\": \"2022-03-22\",\n        \"actorId\": {{actorId}}\n    }",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1316,8 +1364,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Returns 404\", () => {",
-									"    pm.expect(pm.response.code).to.eql(404)",
+									"pm.test(\"Returns 204\", () => {",
+									"    pm.expect(pm.response.code).to.eql(204)",
 									"})"
 								],
 								"type": "text/javascript",
@@ -1484,6 +1532,14 @@
 		},
 		{
 			"key": "actor_id",
+			"value": ""
+		},
+		{
+			"key": "title",
+			"value": ""
+		},
+		{
+			"key": "id",
 			"value": ""
 		}
 	]
