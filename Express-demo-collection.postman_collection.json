@@ -1089,7 +1089,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": " {\n        \"title\": \"The Great Adventure\",\n        \"creationDate\": \"2023-01-15\",\n        \"actorId\": 121\n    }",
+							"raw": " {\n        \"title\": \"The Great Adventure\",\n        \"creationDate\": \"2023-01-15\",\n        \"actorId\": {{actorId}}\n    }",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1149,7 +1149,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": " {\n        \"title\": \"The Great Adventure\",\n        \"creationDate\": \"2009-01-15\",\n        \"actorId\": 121\n    }",
+							"raw": " {\n        \"title\": \"The Great Adventure\",\n        \"creationDate\": \"2009-01-15\",\n        \"actorId\": {{actorId}}\n    }",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1180,8 +1180,10 @@
 								"exec": [
 									"pm.test(\"title update correct\", () => {",
 									"    const responseJSON = pm.response.json();",
+									"    const id = pm.collectionVariables.get(\"id\");",
 									"    const title = pm.collectionVariables.get(\"movieTitle\");",
 									"",
+									"    pm.expect(responseJSON.id).to.eql(id);",
 									"    pm.expect(responseJSON.title).to.eql(title);",
 									"});",
 									""
@@ -1216,6 +1218,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
+									"// Fixed reference error for jsonData",
 									"pm.test(\"Returns 200\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"});",
@@ -1224,18 +1227,17 @@
 									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
 									"});",
 									"",
-									"pm.test(\"Check if id, title of movie and actorId update correct\", () => {",
+									"pm.test(\"Check if id of movie and title update correct\", () => {",
 									"    const id = pm.collectionVariables.get(\"id\");",
 									"    const title = pm.collectionVariables.get(\"title\");",
-									"    const actorId = pm.collectionVariables.get(\"actor_id\"); ",
-									"",
+									"    const actorId = pm.collectionVariables.get(\"actor_id\");",
 									"    const jsonData = pm.response.json();",
+									"",
 									"    const found = jsonData.some(item => {",
 									"        return item.id === id &&",
 									"               item.title === title &&",
-									"               item.actor_id === actorId;",
+									"               item.actor_id === actorId",
 									"    });",
-									"",
 									"    pm.expect(found).to.be.true;",
 									"});",
 									""
