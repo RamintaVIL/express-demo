@@ -1133,8 +1133,8 @@
 									"pm.collectionVariables.set('actor_id',requestJson.actorId)",
 									"",
 									"pm.test(\"Check that returned data is correct\", () => {",
-									"    const movieId = pm.collectionVariables.get(\"movieId\")",
-									"    pm.expect(responseJson.id).to.eql(movieId)",
+									"    const id = pm.collectionVariables.get(\"movieId\")",
+									"    pm.expect(responseJson.id.toString()).to.eql(id.toString())",
 									"    pm.expect(responseJson.title).to.eql(requestJson.title);",
 									"    pm.expect(responseJson.actor_id).to.eql(requestJson.actorId);",
 									"})"
@@ -1172,18 +1172,18 @@
 					"response": []
 				},
 				{
-					"name": "Retrieve a deleted movie by ID",
+					"name": "retriew movie by id",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"title update correct\", () => {",
+									"pm.test(\"Movie title and id update correct\", () => {",
 									"    const responseJSON = pm.response.json();",
-									"    const id = pm.collectionVariables.get(\"id\");",
-									"    const title = pm.collectionVariables.get(\"movieTitle\");",
+									"    const id = pm.collectionVariables.get(\"movieId\");",
+									"    const title = pm.collectionVariables.get(\"movieTitle\");;",
 									"",
-									"    pm.expect(responseJSON.id).to.eql(id);",
+									"    pm.expect(responseJSON.id.toString()).to.eql(id.toString());",
 									"    pm.expect(responseJSON.title).to.eql(title);",
 									"});",
 									""
