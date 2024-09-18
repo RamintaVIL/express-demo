@@ -18,6 +18,7 @@
 								"exec": [
 									"//tai Postman funkcija, kuri grąžina JSON formato atsakymą iš API",
 									"const responseJson = pm.response.json()",
+									"//is request padarome json",
 									"const requestBody = pm.request.body.raw;",
 									"const requestJson = JSON.parse(requestBody);",
 									"",
@@ -62,68 +63,6 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "http://localhost:3000/actor",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"actor"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Retrieve the list of created actors",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Returns 200\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200)",
-									"})",
-									"",
-									"pm.test('\"Response time is less than 2 seconds', () => {",
-									"    pm.expect(pm.response.responseTime).to.be.below(2000)",
-									"}) ",
-									"",
-									"pm.test(\"Check if name, surname, and ID are correct\", () => {",
-									"    // Gauk kintamuosius iš kolekcijos ar aplinkos",
-									"    const actorId = pm.collectionVariables.get(\"actorId\").toString(); // Konvertuoti į string",
-									"    const name = pm.collectionVariables.get(\"actorName\"); ",
-									"    const surname = pm.collectionVariables.get(\"actorSurname\");",
-									"",
-									"    // Gauk JSON atsakymą iš užklausos",
-									"    const jsonData = pm.response.json();",
-									"",
-									"    // Atspausdink atsakymo JSON struktūrą ir kintamuosius",
-									"    console.log('Actor ID:', actorId);",
-									"    console.log('Response JSON:', jsonData);",
-									"",
-									"    // Patikrink, ar bent vienas elementas atitinka ID, vardą ir pavardę",
-									"    const found = jsonData.some(function (item) {",
-									"        return item.id.toString() === actorId && item.name === name && item.surname === surname;",
-									"    });",
-									"",
-									"    // Testas bus laikomas sėkmingu, jei elementas buvo rastas",
-									"    pm.expect(found, 'Record not found in response').to.be.true;",
-									"});",
-									"",
-									"",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
 						"url": {
 							"raw": "http://localhost:3000/actor",
 							"protocol": "http",
@@ -206,6 +145,68 @@
 					"response": []
 				},
 				{
+					"name": "Retrieve the list of created actors",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Returns 200\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200)",
+									"})",
+									"",
+									"pm.test('\"Response time is less than 2 seconds', () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000)",
+									"}) ",
+									"",
+									"pm.test(\"Check if name, surname, and ID are correct\", () => {",
+									"    // Gauk kintamuosius iš kolekcijos ar aplinkos",
+									"    const actorId = pm.collectionVariables.get(\"actorId\").toString(); // Konvertuoti į string",
+									"    const name = pm.collectionVariables.get(\"actorName\"); ",
+									"    const surname = pm.collectionVariables.get(\"actorSurname\");",
+									"",
+									"    // Gauk JSON atsakymą iš užklausos",
+									"    const jsonData = pm.response.json();",
+									"",
+									"    // Atspausdink atsakymo JSON struktūrą ir kintamuosius",
+									"    console.log('Actor ID:', actorId);",
+									"    console.log('Response JSON:', jsonData);",
+									"",
+									"    // Patikrink, ar bent vienas elementas atitinka ID, vardą ir pavardę",
+									"    const found = jsonData.some(function (item) {",
+									"        return item.id.toString() === actorId && item.name === name && item.surname === surname;",
+									"    });",
+									"",
+									"    // Testas bus laikomas sėkmingu, jei elementas buvo rastas",
+									"    pm.expect(found, 'Record not found in response').to.be.true;",
+									"});",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/actor",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"actor"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Create an actor with an incorrect birth date",
 					"event": [
 						{
@@ -262,7 +263,26 @@
 							"listen": "test",
 							"script": {
 								"exec": [
+									"//tai Postman funkcija, kuri grąžina JSON formato atsakymą iš API",
+									"const responseJson = pm.response.json()",
+									"//is request padarome json",
+									"const requestBody = pm.request.body.raw;",
+									"const requestJson = JSON.parse(requestBody);",
 									"",
+									"pm.collectionVariables.set('actorId', responseJson.id)",
+									"pm.test(\"Check that returned data is correct\", () => {",
+									"    pm.expect(responseJson.id).to.be.a('number').and.be.above(0);",
+									"    pm.expect(responseJson.name).to.eql(requestJson.name);",
+									"    pm.expect(responseJson.surname).to.eql(requestJson.surname);",
+									"})",
+									"",
+									"pm.test(\"Response status code is 201\", () => {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 2 seconds\", () => {",
+									"  pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});",
 									""
 								],
 								"type": "text/javascript",
@@ -303,6 +323,48 @@
 							"listen": "test",
 							"script": {
 								"exec": [
+									"pm.test(\"Response status code is 200\", () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 2 seconds\", () => {",
+									"  pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});",
+									"",
+									"const responseJson = pm.response.json()",
+									"const requestBody = pm.request.body.raw;",
+									"const requestJson = JSON.parse(requestBody)",
+									"",
+									"pm.collectionVariables.set('actorName',requestJson.name)",
+									"pm.collectionVariables.set('actorSurname',requestJson.surname)",
+									"",
+									"pm.test(\"Check that returned data is correct\", () => {",
+									"    const actorId = pm.collectionVariables.get(\"actorId\") // Fixed the reference error for actorId",
+									"    pm.expect(responseJson.id).to.eql(actorId) // Fixed the reference error for id",
+									"    pm.expect(responseJson.name).to.eql(requestJson.name);",
+									"    pm.expect(responseJson.surname).to.eql(requestJson.surname);",
+									"})",
+									"",
+									"// const responseJson = pm.response.json();",
+									"// const requestBody = pm.request.body.raw;",
+									"// const requestJson = JSON.parse(requestBody);",
+									"",
+									"// // Nustatyk kolekcijos kintamuosius (jei reikia juos naudoti vėliau)",
+									"// pm.collectionVariables.set('actorName', requestJson.name);",
+									"// pm.collectionVariables.set('actorSurname', requestJson.surname);",
+									"",
+									"// // Testavimas, ar grąžinti duomenys yra teisingi",
+									"// pm.test(\"Check that returned data is correct\", () => {",
+									"//     // Gauk kintamuosius iš kolekcijos arba atsakymo",
+									"//     const actorId = pm.collectionVariables.get(\"actorId\"); ",
+									"",
+									"//     // Patikrink, ar atsakymas turi laukus",
+									"//     pm.expect(responseJson).to.have.property(\"id\", actorId);",
+									"//     pm.expect(responseJson).to.have.property(\"name\", requestJson.name);",
+									"//     pm.expect(responseJson).to.have.property(\"surname\", requestJson.surname);",
+									"// });",
+									"",
+									"",
 									"",
 									""
 								],
@@ -324,7 +386,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:3000/actor/2",
+							"raw": "http://localhost:3000/actor/{{actorId}}",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -332,7 +394,7 @@
 							"port": "3000",
 							"path": [
 								"actor",
-								"2"
+								"{{actorId}}"
 							]
 						}
 					},
@@ -345,7 +407,15 @@
 							"listen": "test",
 							"script": {
 								"exec": [
+									"pm.test(\"Name and surname update correct\", () => {",
+									"    const responseJSON = pm.response.json();",
+									"    const firstName = pm.collectionVariables.get(\"actorName\");",
+									"    const surname = pm.collectionVariables.get(\"actorSurname\");",
 									"",
+									"    // Patikrinkite, ar `name` ir `surname` atitinka kintamųjų reikšmes",
+									"    pm.expect(responseJSON.name).to.eql(firstName);",
+									"    pm.expect(responseJSON.surname).to.eql(surname);",
+									"});",
 									""
 								],
 								"type": "text/javascript",
@@ -357,7 +427,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:3000/actor/2",
+							"raw": "http://localhost:3000/actor/{{actorId}}",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -365,7 +435,7 @@
 							"port": "3000",
 							"path": [
 								"actor",
-								"2"
+								"{{actorId}}"
 							]
 						}
 					},
@@ -378,7 +448,27 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									""
+									"pm.test(\"Returns 200\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200)",
+									"})",
+									"",
+									"pm.test('\"Response time is less than 2 seconds', () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000)",
+									"}) ",
+									"",
+									"pm.test(\"Check if update request info is correct\", () => {",
+									"    const actorId = pm.collectionVariables.get(\"actorId\").toString();",
+									"    const name = pm.collectionVariables.get(\"actorName\"); ",
+									"    const surname = pm.collectionVariables.get(\"actorSurname\");",
+									"",
+									"    const jsonData = pm.response.json();",
+									"",
+									"    const found = jsonData.some(function (item) {",
+									"        return item.id.toString() === actorId && item.name === name && item.surname === surname;",
+									"    });",
+									"",
+									"    pm.expect(found, 'Record not found in response').to.be.true;",
+									"});"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -460,7 +550,29 @@
 							"listen": "test",
 							"script": {
 								"exec": [
+									"//tai Postman funkcija, kuri grąžina JSON formato atsakymą iš API",
+									"const responseJson = pm.response.json()",
+									"//is request padarome json",
+									"const requestBody = pm.request.body.raw;",
+									"const requestJson = JSON.parse(requestBody);",
 									"",
+									"pm.collectionVariables.set('actorId', responseJson.id)",
+									"pm.collectionVariables.set('actorName',requestJson.name)",
+									"pm.collectionVariables.set('actorSurname',requestJson.surname)",
+									"",
+									"pm.test(\"Check that returned data is correct\", () => {",
+									"    pm.expect(responseJson.id).to.be.a('number').and.be.above(0);",
+									"    pm.expect(responseJson.name).to.eql(requestJson.name);",
+									"    pm.expect(responseJson.surname).to.eql(requestJson.surname);",
+									"})",
+									"",
+									"pm.test(\"Response status code is 201\", () => {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 2 seconds\", () => {",
+									"  pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});",
 									"",
 									""
 								],
@@ -508,7 +620,9 @@
 									"",
 									"pm.test(\"Response body is empty\", () => {",
 									"    pm.expect(pm.response.text()).to.be.empty;",
-									"});"
+									"});",
+									"",
+									""
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -549,7 +663,10 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									""
+									"pm.test(\"Deleting a non-existent actor returns 404 status code\", function () {",
+									"    pm.response.to.have.status(404);",
+									"    pm.response.to.have.body('Actor not found');",
+									"});"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -560,7 +677,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:3000/actor/2",
+							"raw": "http://localhost:3000/actor/{{actorId}}",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -568,7 +685,7 @@
 							"port": "3000",
 							"path": [
 								"actor",
-								"2"
+								"{{actorId}}"
 							]
 						}
 					},
@@ -581,7 +698,19 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									""
+									"pm.test(\"GET all actors should not include deleted actor\", () =>  {",
+									"    pm.sendRequest({",
+									"        url: 'http://localhost:3000/actor',",
+									"        method: 'GET'",
+									"    }, function (err, res) {",
+									"        const actors = res.json();",
+									"        const deletedActorId = pm.collectionVariables.get(\"actorIdToDelete\");",
+									"",
+									"        // Patikrinkite, ar sąraše nėra ištrinto aktoriaus",
+									"        const actorExists = actors.some(actor => actor.id === parseInt(deletedActorId));",
+									"        pm.expect(actorExists).to.be.false; // Tikrina, ar ištrintas aktorius nerandamas sąraše",
+									"    });",
+									"});"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -654,10 +783,31 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Movie title is correct\", () => {",
-									"    const responseJson = pm.response.json()",
-									"    pm.expect(responseJson.title).to.eql(\"Mystery of the Lost City\")",
-									"})",
+									"const responseJson = pm.response.json();",
+									"const requestBody = pm.request.body.raw;",
+									"const requestJson = JSON.parse(requestBody);",
+									"",
+									"// Nustatyk kolekcijos kintamuosius",
+									"pm.collectionVariables.set('movieId', responseJson.id);",
+									"",
+									"pm.test(\"Check that returned movie data is correct\", () => {",
+									"    // Patikrink, ar filmo pavadinimas sutampa",
+									"    pm.expect(responseJson.title).to.eql(requestJson.title);",
+									"    ",
+									"    // Patikrink, ar aktoriaus ID sutampa",
+									"    pm.expect(responseJson.actor_id).to.eql(requestJson.actorId);",
+									"});",
+									"",
+									"pm.test(\"Response status code is 201\", () => {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 2 seconds\", () => {",
+									"  pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});",
+									"",
+									"",
+									"",
 									""
 								],
 								"type": "text/javascript",
@@ -670,7 +820,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": " {\n        \"title\": \"Mystery of the Lost City\",\n        \"creationDate\": \"2022-03-22\",\n        \"actorId\": 113\n    }",
+							"raw": " {\n        \"title\": \"Mystery of the Lost City\",\n        \"creationDate\": \"2022-03-22\",\n        \"actorId\": 121\n    }",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -693,6 +843,44 @@
 				},
 				{
 					"name": "Retrieve the created movie by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", () => {",
+									"  pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('\"Response time is less than 2 seconds', () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000)",
+									"}) ",
+									"",
+									"// id = pm.collectionVariables.get('movieId')",
+									"// console.log(actor_id)",
+									"",
+									"// pm.test('check if returned movie has correct id', () => {",
+									"//     const data = pm.response.json()",
+									"//     pm.expect(data.id).to.be.eql(id)",
+									"// })",
+									"",
+									"// pm.test(\"Name and surname match input\", () => {",
+									"//     const responseJSON = pm.response.json();",
+									"//     const title = pm.collectionVariables.get(\"movieTitle\");",
+									"//     const actor_id = pm.collectionVariables.get(\"actor_id\");",
+									"",
+									"//     pm.expect(responseJSON.title).to.eql(title);",
+									"//     pm.expect(responseJSON.actor_id).to.eql(actor_id);",
+									"// });",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -720,7 +908,24 @@
 								"exec": [
 									"pm.test(\"Returns 200\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200)",
-									"})"
+									"})",
+									"",
+									"pm.test(\"Response time is less than 2 seconds\", () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000)",
+									"}) ",
+									"",
+									"pm.test(\"Check if movie information is correct\", () => {",
+									"    const id = pm.collectionVariables.get(\"id\");",
+									"    const title = pm.collectionVariables.get(\"title\"); ",
+									"    const actorId = pm.collectionVariables.get(\"actor_id\");",
+									"",
+									"    const jsonData = pm.response.json();",
+									"",
+									"    pm.expect(jsonData.id).to.eql(id);",
+									"    pm.expect(jsonData.title).to.eql(title);",
+									"    pm.expect(jsonData.actor_id).to.eql(actorId);",
+									"});",
+									""
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -768,7 +973,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": " {\n        \"title\": \"Mystery of the Lost City\",\n        \"creationDate\": \"2080-03-22\",\n        \"actorId\": 2\n    }",
+							"raw": " {\n        \"title\": \"Mystery of the Lost City\",\n        \"creationDate\": \"2080-03-22\",\n        \"actorId\": 121\n    }",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -801,7 +1006,24 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									""
+									"const responseJson = pm.response.json()",
+									"const requestBody = pm.request.body.raw;",
+									"const requestJson = JSON.parse(requestBody);",
+									"",
+									"pm.collectionVariables.set('movieId', responseJson.id);",
+									"",
+									"pm.test(\"Check that returned data is correct\", () => {",
+									"    pm.expect(responseJson.title).to.eql(requestJson.title);",
+									"    pm.expect(responseJson.actor_id).to.eql(requestJson.actorId);",
+									"})",
+									"",
+									"pm.test(\"Response status code is 201\", () => {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 2 seconds\", () => {",
+									"  pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -813,7 +1035,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": " {\n        \"title\": \"The Great Adventure\",\n        \"creationDate\": \"2023-01-15\",\n        \"actorId\": 3\n    }",
+							"raw": " {\n        \"title\": \"The Great Adventure\",\n        \"creationDate\": \"2023-01-15\",\n        \"actorId\": 121\n    }",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -841,10 +1063,26 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"update movie information is correct\", () => {",
-									"    const responseJson = pm.response.json()",
-									"    pm.expect(responseJson.title).to.eql(\"The Great Adventure\");",
-									"    pm.expect(responseJson.actor_id).to.eql(4)",
+									"pm.test(\"Response status code is 200\", () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 2 seconds\", () => {",
+									"  pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});",
+									"",
+									"const responseJson = pm.response.json()",
+									"const requestBody = pm.request.body.raw;",
+									"const requestJson = JSON.parse(requestBody)",
+									"",
+									"pm.collectionVariables.set('movieTitle',requestJson.title)",
+									"pm.collectionVariables.set('actor_id',requestJson.actorId)",
+									"",
+									"pm.test(\"Check that returned data is correct\", () => {",
+									"    const movieId = pm.collectionVariables.get(\"movieId\")",
+									"    pm.expect(responseJson.id).to.eql(movieId)",
+									"    pm.expect(responseJson.title).to.eql(requestJson.title);",
+									"    pm.expect(responseJson.actor_id).to.eql(requestJson.actorId);",
 									"})"
 								],
 								"type": "text/javascript",
@@ -857,7 +1095,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": " {\n        \"title\": \"The Great Adventure\",\n        \"creationDate\": \"2009-01-15\",\n        \"actorId\": 4\n    }",
+							"raw": " {\n        \"title\": \"The Great Adventure\",\n        \"creationDate\": \"2009-01-15\",\n        \"actorId\": 121\n    }",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -865,7 +1103,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:3000/movie/3",
+							"raw": "http://localhost:3000/movie/{{movieId}}",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -873,7 +1111,7 @@
 							"port": "3000",
 							"path": [
 								"movie",
-								"3"
+								"{{movieId}}"
 							]
 						}
 					},
@@ -881,11 +1119,29 @@
 				},
 				{
 					"name": "Retrieve a deleted movie by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"title update correct\", () => {",
+									"    const responseJSON = pm.response.json();",
+									"    const title = pm.collectionVariables.get(\"movieTitle\");",
+									"",
+									"    pm.expect(responseJSON.title).to.eql(title);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:3000/movie/3",
+							"raw": "http://localhost:3000/movie/{{movieId}}",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -893,7 +1149,7 @@
 							"port": "3000",
 							"path": [
 								"movie",
-								"3"
+								"{{movieId}}"
 							]
 						}
 					},
@@ -906,7 +1162,35 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									""
+									"pm.test(\"Returns 200\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200)",
+									"})",
+									"",
+									"pm.test(\"Response time is less than 2 seconds\", () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000)",
+									"}) ",
+									"",
+									"pm.test(\"Check if update request info is correct\", () => {",
+									"    const id = pm.collectionVariables.get(\"id\");",
+									"    const title = pm.collectionVariables.get(\"title\");",
+									"    const actor_id = pm.collectionVariables.get(\"actorId\");",
+									"",
+									"    console.log(\"movieId:\", id);",
+									"    console.log(\"movieTitle:\", title);",
+									"    console.log(\"actorId:\", actor_id);",
+									"    console.log(\"Response JSON:\", jsonData);",
+									"",
+									"",
+									"    const jsonData = pm.response.json();",
+									"",
+									"    const found = jsonData.some(item => {",
+									"        return item.id === id &&",
+									"               item.title === title &&",
+									"               item.actor_id === actorId;",
+									"    });",
+									"",
+									"    pm.expect(found, 'Record not found in response').to.be.true;",
+									"});"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -1065,7 +1349,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:3000/movie/4",
+							"raw": "http://localhost:3000/movie/{{movieId}}",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -1073,7 +1357,7 @@
 							"port": "3000",
 							"path": [
 								"movie",
-								"4"
+								"{{movieId}}"
 							]
 						}
 					},
@@ -1189,6 +1473,18 @@
 			"key": "movieId",
 			"value": "",
 			"type": "string"
+		},
+		{
+			"key": "movieTitle",
+			"value": ""
+		},
+		{
+			"key": "movieCreationDate",
+			"value": ""
+		},
+		{
+			"key": "actor_id",
+			"value": ""
 		}
 	]
 }
